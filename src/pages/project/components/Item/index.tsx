@@ -215,7 +215,7 @@ class Item extends React.Component<ItemProps, ItemState> {
 
     const {itemModel, opcUaConnection, opcUaGroup, form} = this.props;
 
-    const {visible, current = {}, selectedRowKeys, state, itemObjectOptionList, itemTypeOptionList} = this.state;
+    const {visible, current = {}, state, itemObjectOptionList, itemTypeOptionList, } = this.state;
 
     const {getFieldDecorator} = form;
 
