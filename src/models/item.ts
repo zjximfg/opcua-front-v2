@@ -57,19 +57,21 @@ const ItemModel: ItemModelType = {
         payload: response,
       });
     },
-    * fetchItemObjectListByOpcUaNamespaceId({payload}, {call, put}) {
+    * fetchItemObjectListByOpcUaNamespaceId({payload, callback}, {call, put}) {
       const response = yield call(fetchItemObjectListByOpcUaNamespaceId, payload);
       yield put({
         type: 'queryItemObjectList',
         payload: response,
       });
+      if (callback) callback(response);
     },
-    * fetchItemTypeListByOpcUaNamespaceId({payload}, {call, put}) {
+    * fetchItemTypeListByOpcUaNamespaceId({payload, callback}, {call, put}) {
       const response = yield call(fetchItemTypeListByOpcUaNamespaceId, payload);
       yield put({
         type: 'queryItemTypeList',
         payload: response,
       });
+      if (callback) callback(response);
     },
   },
   reducers: {
