@@ -180,6 +180,44 @@ class Item extends React.Component<ItemProps, ItemState> {
 
   handleSubmit = (): void => {
     // TODO
+    const {dispatch, form} = this.props;
+    if (!dispatch) return;
+    form.validateFields((err: string | undefined, fieldsValue: OpcUaItemDataType): void => {
+      if (err) return;
+      const item: OpcUaItemDataType = {
+        ...fieldsValue
+      };
+      if (this.state.formType === 'edit') {
+        dispatch({
+          type: 'item/editOpcUaItemFetch',
+          payload: item,
+          callback: () => {
+            dispatch({
+              type: 'item/fetchOpcUaItemListByGroupId',
+              payload: {opcUaGroupId: this.props.opcUaGroup.id},
+            });
+          }
+        });
+      } else {
+        if (this.state.formType === 'create') {
+          dispatch({
+            type: 'item/createOpcUaItemFetch',
+            payload: item,
+            callback: () => {
+              dispatch({
+                type: 'item/fetchOpcUaItemListByGroupId',
+                payload: {opcUaGroupId: this.props.opcUaGroup.id},
+              });
+            }
+          });
+        }
+      }
+      this.setState({
+        visible: false,
+        formType: undefined,
+        current: undefined
+      })
+    })
   };
 
   handleCategoryOnChange = (item: number) => {
@@ -355,7 +393,7 @@ class Item extends React.Component<ItemProps, ItemState> {
           <FormItem label={"Address"} {...formLayout}>
             {
               getFieldDecorator("address", {
-                initialValue: current.dbNumber,
+                initialValue: current.address,
                 rules: [{required: this.state.dbNumberShow, message: "Please input the address"}]
               })(
                 <InputNumber placeholder={'Address'}/>

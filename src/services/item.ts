@@ -1,4 +1,5 @@
 import request, {baseUrl} from '@/utils/request';
+import OpcUaItemDataType from "@/pages/project/components/Item/opcUaItem";
 
 export async function fetchOpcUaItemListByGroupId(payload: {opcUaGroupId: number}) {
   return request(baseUrl + 'project/opcUaItem/list', {
@@ -25,5 +26,19 @@ export async function fetchItemTypeListByOpcUaNamespaceId(payload: {opcUaNamespa
   return request(baseUrl + 'project/opcUaItem/itemType/list', {
     method: 'get',
     params: payload,
+  })
+}
+
+export async function editOpcUaItemFetch(payload: Partial<OpcUaItemDataType>) {
+  return request(baseUrl + 'project/opcUaItem', {
+    method: 'put',
+    data: payload,
+  })
+}
+
+export async function createOpcUaItemFetch(payload: Partial<OpcUaItemDataType>) {
+  return request(baseUrl + 'project/opcUaItem', {
+    method: 'post',
+    data: payload,
   })
 }

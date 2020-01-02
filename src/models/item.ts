@@ -5,6 +5,8 @@ import ItemTypeDataType from "@/pages/project/components/Item/opcUaItem";
 import {Effect} from "dva";
 import {Reducer} from "redux";
 import {
+  createOpcUaItemFetch,
+  editOpcUaItemFetch,
   fetchItemCategoryListByOpcUaNamespaceId,
   fetchItemObjectListByOpcUaNamespaceId,
   fetchItemTypeListByOpcUaNamespaceId, fetchOpcUaItemListByGroupId
@@ -25,6 +27,8 @@ export interface ItemModelType {
     fetchItemCategoryListByOpcUaNamespaceId: Effect;
     fetchItemObjectListByOpcUaNamespaceId: Effect;
     fetchItemTypeListByOpcUaNamespaceId: Effect;
+    editOpcUaItemFetch: Effect;
+    createOpcUaItemFetch: Effect;
   },
   reducers: {
     queryOpcUaItemList: Reducer<ItemModelStateType>;
@@ -73,6 +77,14 @@ const ItemModel: ItemModelType = {
       });
       if (callback) callback(response);
     },
+    * editOpcUaItemFetch({payload, callback}, {call, put}) {
+      yield call(editOpcUaItemFetch, payload);
+      if (callback) callback();
+    },
+    * createOpcUaItemFetch({payload, callback}, {call, put}) {
+      yield call(createOpcUaItemFetch, payload);
+      if (callback) callback();
+    }
   },
   reducers: {
     queryOpcUaItemList(state = state, action) {
