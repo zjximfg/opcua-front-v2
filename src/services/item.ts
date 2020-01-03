@@ -42,3 +42,11 @@ export async function createOpcUaItemFetch(payload: Partial<OpcUaItemDataType>) 
     data: payload,
   })
 }
+
+export async function fetchOnlineDataByGroupId(payload: {opcUaGroupId: number}) {
+  return request(baseUrl + 'project/opcUaItem/list/online',{
+    method: 'get',
+    params: payload,
+  })
+
+}

@@ -54,6 +54,7 @@ class Group extends React.Component<GroupProps, GroupState> {
   componentWillReceiveProps(nextProps: Readonly<GroupProps>, nextContext: any): void {
     if (!this.props.groupModel || !nextProps.groupModel) return;
     if (this.props.opcUaConnection.id !== nextProps.opcUaConnection.id) {
+      console.log(nextProps.groupModel.selectedGroup)
       if (!this.props.dispatch) return;
       this.props.dispatch({
         type: 'group/groupListFetchByConnectionId',
@@ -62,6 +63,10 @@ class Group extends React.Component<GroupProps, GroupState> {
       this.setState({
         selectedRowKeys: [],
       });
+      this.props.dispatch({
+        type: 'group/setSelectedGroup',
+        payload: {},
+      })
     }
   }
 
@@ -184,7 +189,7 @@ class Group extends React.Component<GroupProps, GroupState> {
         dataIndex: 'storagePeriodId',
         width: 200,
         render: (text, record) => {
-          const storagePeriod = groupModel.storagePeriodList.find((item: StoragePeriodDataType) => record.id === item.id);
+          const storagePeriod = groupModel.storagePeriodList.find((item: StoragePeriodDataType) => record.storagePeriodId === item.id);
           if (storagePeriod) {
             return storagePeriod.name;
           } else {

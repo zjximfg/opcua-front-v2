@@ -9,7 +9,7 @@ import {
   editOpcUaItemFetch,
   fetchItemCategoryListByOpcUaNamespaceId,
   fetchItemObjectListByOpcUaNamespaceId,
-  fetchItemTypeListByOpcUaNamespaceId, fetchOpcUaItemListByGroupId
+  fetchItemTypeListByOpcUaNamespaceId, fetchOnlineDataByGroupId, fetchOpcUaItemListByGroupId
 } from "@/services/item";
 
 export interface ItemModelStateType {
@@ -29,12 +29,14 @@ export interface ItemModelType {
     fetchItemTypeListByOpcUaNamespaceId: Effect;
     editOpcUaItemFetch: Effect;
     createOpcUaItemFetch: Effect;
+    fetchOnlineDataByGroupId: Effect;
   },
   reducers: {
     queryOpcUaItemList: Reducer<ItemModelStateType>;
     queryItemCategoryList: Reducer<ItemModelStateType>;
     queryItemObjectList: Reducer<ItemModelStateType>;
     queryItemTypeList: Reducer<ItemModelStateType>;
+    resetOpcUaItemList: Reducer<ItemModelStateType>;
   }
 }
 
@@ -77,13 +79,20 @@ const ItemModel: ItemModelType = {
       });
       if (callback) callback(response);
     },
-    * editOpcUaItemFetch({payload, callback}, {call, put}) {
+    * editOpcUaItemFetch({payload, callback}, {call}) {
       yield call(editOpcUaItemFetch, payload);
       if (callback) callback();
     },
-    * createOpcUaItemFetch({payload, callback}, {call, put}) {
+    * createOpcUaItemFetch({payload, callback}, {call}) {
       yield call(createOpcUaItemFetch, payload);
       if (callback) callback();
+    },
+    * fetchOnlineDataByGroupId({payload}, {call, put}) {
+      const response = yield call(fetchOnlineDataByGroupId, payload);
+      yield put({
+        type: 'queryOpcUaItemList',
+        payload: response,
+      });
     }
   },
   reducers: {
@@ -111,6 +120,12 @@ const ItemModel: ItemModelType = {
         itemTypeList: action.payload
       }
     },
+    resetOpcUaItemList(state = state, action) {
+      return {
+        ...state,
+        opcUaItemList: []
+      }
+    }
   },
 };
 

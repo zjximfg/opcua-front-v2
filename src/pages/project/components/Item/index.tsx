@@ -31,7 +31,7 @@ interface ItemState {
   formType: 'edit' | 'create' | undefined;
   current?: Partial<OpcUaItemDataType>;
   selectedRowKeys: string[] | number[];
-  intervalNumber: number;
+  intervalNumber: NodeJS.Timeout | null;
   state: 'online' | 'offline';
   itemObjectOptionList: Array<ItemObjectDataType>;
   itemTypeOptionList: Array<ItemTypeDataType>;
@@ -54,7 +54,7 @@ class Item extends React.Component<ItemProps, ItemState> {
     formType: undefined,
     current: undefined,
     selectedRowKeys: [],
-    intervalNumber: 0,
+    intervalNumber: null,
     state: 'offline',
     itemObjectOptionList: [],
     itemTypeOptionList: [],
@@ -66,12 +66,20 @@ class Item extends React.Component<ItemProps, ItemState> {
 
 
   componentWillReceiveProps(nextProps: Readonly<ItemProps>, nextContext: any): void {
-    if (this.props.opcUaGroup.id !== nextProps.opcUaGroup.id) {
+    if (this.props.opcUaGroup.id !== nextProps.opcUaGroup.id ) {
+      if (!("id" in nextProps.opcUaGroup)) return;
       if (!this.props.dispatch) return;
       this.props.dispatch({
         type: 'item/fetchOpcUaItemListByGroupId',
         payload: {opcUaGroupId: nextProps.opcUaGroup.id},
       });
+      // 清除online 功能 （包括1. 按钮状态，2. 结束周期timer）
+      if (this.state.intervalNumber === null) return;
+      clearInterval(this.state.intervalNumber);
+      this.setState({
+        state: "offline",
+        intervalNumber: null,
+      })
     }
 
     if (this.props.opcUaConnection.id !== nextProps.opcUaConnection.id) {
@@ -89,6 +97,17 @@ class Item extends React.Component<ItemProps, ItemState> {
         type: 'item/fetchItemTypeListByOpcUaNamespaceId',
         payload: {opcUaNamespaceId: nextProps.opcUaConnection.opcUaNamespaceId}
       });
+      // 清除列表内的显示数据
+      dispatch({
+        type: 'item/resetOpcUaItemList',
+      });
+      // 清除online 功能 （包括1. 按钮状态，2. 结束周期timer）
+      if (this.state.intervalNumber === null) return;
+      clearInterval(this.state.intervalNumber);
+      this.setState({
+        state: "offline",
+        intervalNumber: null,
+      })
     }
   }
 
@@ -160,16 +179,29 @@ class Item extends React.Component<ItemProps, ItemState> {
     })
   };
 
+  updateOnlineData = () => {
+    const {dispatch} = this.props;
+    if (!dispatch) return;
+    dispatch({
+      type: 'item/fetchOnlineDataByGroupId',
+      payload: {opcUaGroupId: this.props.opcUaGroup.id},
+    });
+  };
+
   handleOnline = () => {
     this.setState({
       state: 'online',
-    })
+      intervalNumber: setInterval(this.updateOnlineData, 2 * 1000),
+    });
   };
 
   handleOffline = () => {
+    if (this.state.intervalNumber === null) return;
+    clearInterval(this.state.intervalNumber);
     this.setState({
       state: 'offline',
-    })
+      intervalNumber: null,
+    });
   };
 
   handleSearch = (value: string) => {
@@ -179,7 +211,6 @@ class Item extends React.Component<ItemProps, ItemState> {
   };
 
   handleSubmit = (): void => {
-    // TODO
     const {dispatch, form} = this.props;
     if (!dispatch) return;
     form.validateFields((err: string | undefined, fieldsValue: OpcUaItemDataType): void => {
@@ -271,7 +302,7 @@ class Item extends React.Component<ItemProps, ItemState> {
         title: 'Category',
         dataIndex: 'itemCategoryId',
         render: (text, record) => {
-          const itemCategory = itemModel.itemCategoryList.find((item: ItemCategoryDataType) => item.id === record.id);
+          const itemCategory = itemModel.itemCategoryList.find((item: ItemCategoryDataType) => item.id === record.itemCategoryId);
           return itemCategory ? itemCategory.name : '';
         }
       },
@@ -285,7 +316,7 @@ class Item extends React.Component<ItemProps, ItemState> {
         title: 'Object',
         dataIndex: 'itemObjectId',
         render: (text, record) => {
-          const itemObject = itemModel.itemObjectList.find((item: ItemObjectDataType) => item.id === record.id);
+          const itemObject = itemModel.itemObjectList.find((item: ItemObjectDataType) => item.id === record.itemObjectId);
           return itemObject ? itemObject.name : '';
         }
       },
@@ -294,7 +325,7 @@ class Item extends React.Component<ItemProps, ItemState> {
         title: 'Type',
         dataIndex: 'itemTypeId',
         render: (text, record) => {
-          const itemType = itemModel.itemTypeList.find((item: ItemTypeDataType) => item.id === record.id);
+          const itemType = itemModel.itemTypeList.find((item: ItemTypeDataType) => item.id === record.itemTypeId);
           return itemType ? itemType.s7Name : '';
         }
       },

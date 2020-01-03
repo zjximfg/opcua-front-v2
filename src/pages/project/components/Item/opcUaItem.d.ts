@@ -15,6 +15,7 @@ export default interface OpcUaItemDataType {
   isArray: boolean;
   description: string;
   currentValue: string;
+  quality: string;
 }
 
 export default interface ItemCategoryDataType {
