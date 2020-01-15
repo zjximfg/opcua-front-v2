@@ -124,6 +124,49 @@ export default {
                 {
                   path: '/project/connection/:id',
                   component: './project/connection/$id',
+                },
+                {
+                  path: '/project/alarmConfig',
+                  name: 'Alarm Configuration',
+                  icon: 'file-text',
+                  routes: [
+                    {
+                      path: '/project/alarmConfig/alarmBase',
+                      name: "Alarm Base Info.",
+                      icon: 'block',
+                      component: './project/alarmConfig/alarmBase'
+                    }
+                  ]
+                },
+              ]
+            },
+            {
+              path: '/history',
+              name: 'History',
+              icon: 'global',
+              routes: [
+                {
+                  path: '/history/itemHistory',
+                  component: './history/itemHistory',
+                },
+                {
+                  path: '/history/alarmHistory',
+                  component: './history/alarmHistory',
+                }
+              ]
+            },
+            {
+              path: '/sms',
+              name: 'SMS Alarm',
+              icon: 'global',
+              routes: [
+                {
+                  path: '/sms/role',
+                  component: './sms/role',
+                },
+                {
+                  path: '/sms/user',
+                  component: './sms/user',
                 }
               ]
             },

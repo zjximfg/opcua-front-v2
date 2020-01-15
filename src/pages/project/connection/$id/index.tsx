@@ -10,8 +10,9 @@ import LoadingDataType from "@/models/loading";
 import Group from "@/pages/project/components/Group";
 import Item from "@/pages/project/components/Item";
 import {GroupModelStateType} from "@/models/group";
+import Alarm from "@/pages/project/components/Alarm";
 
-interface ConnectionProps extends FormComponentProps{
+interface ConnectionProps extends FormComponentProps {
   match: match<{ id: string }>;
   dispatch: Dispatch<any>;
   loading: boolean;
@@ -22,7 +23,7 @@ interface ConnectionProps extends FormComponentProps{
 interface ConnectionState {
 }
 
-@connect(({connection, group, loading} : {connection: ConnectionModelStateType, group: GroupModelStateType, loading: LoadingDataType}) => {
+@connect(({connection, group, loading}: { connection: ConnectionModelStateType, group: GroupModelStateType, loading: LoadingDataType }) => {
   return {
     connectionModel: connection,
     groupModal: group,
@@ -63,6 +64,11 @@ class Connection extends React.Component<ConnectionProps, ConnectionState> {
             </Col>
             <Col span={16}>
               <Item opcUaConnection={connectionModel.opcUaConnection} opcUaGroup={groupModal.selectedGroup}/>
+            </Col>
+          </Row>
+          <Row gutter={18} style={{marginTop: 18}}>
+            <Col span={24}>
+              <Alarm opcUaConnection={connectionModel.opcUaConnection}/>
             </Col>
           </Row>
         </PageHeaderWrapper>

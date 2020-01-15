@@ -54,7 +54,6 @@ class Group extends React.Component<GroupProps, GroupState> {
   componentWillReceiveProps(nextProps: Readonly<GroupProps>, nextContext: any): void {
     if (!this.props.groupModel || !nextProps.groupModel) return;
     if (this.props.opcUaConnection.id !== nextProps.opcUaConnection.id) {
-      console.log(nextProps.groupModel.selectedGroup)
       if (!this.props.dispatch) return;
       this.props.dispatch({
         type: 'group/groupListFetchByConnectionId',

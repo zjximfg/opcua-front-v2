@@ -43,6 +43,13 @@ export async function createOpcUaItemFetch(payload: Partial<OpcUaItemDataType>) 
   })
 }
 
+export async function deleteItemFetch(payload: Partial<OpcUaItemDataType>) {
+  return request(baseUrl + 'project/opcUaItem', {
+    method: 'delete',
+    data: payload,
+  })
+}
+
 export async function fetchOnlineDataByGroupId(payload: {opcUaGroupId: number}) {
   return request(baseUrl + 'project/opcUaItem/list/online',{
     method: 'get',

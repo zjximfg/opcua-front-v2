@@ -5,7 +5,7 @@ import ItemTypeDataType from "@/pages/project/components/Item/opcUaItem";
 import {Effect} from "dva";
 import {Reducer} from "redux";
 import {
-  createOpcUaItemFetch,
+  createOpcUaItemFetch, deleteItemFetch,
   editOpcUaItemFetch,
   fetchItemCategoryListByOpcUaNamespaceId,
   fetchItemObjectListByOpcUaNamespaceId,
@@ -29,6 +29,7 @@ export interface ItemModelType {
     fetchItemTypeListByOpcUaNamespaceId: Effect;
     editOpcUaItemFetch: Effect;
     createOpcUaItemFetch: Effect;
+    deleteItemFetch: Effect;
     fetchOnlineDataByGroupId: Effect;
   },
   reducers: {
@@ -87,6 +88,10 @@ const ItemModel: ItemModelType = {
       yield call(createOpcUaItemFetch, payload);
       if (callback) callback();
     },
+    * deleteItemFetch({payload, callback}, {call}) {
+      yield call(deleteItemFetch, payload);
+      if (callback) callback();
+    },
     * fetchOnlineDataByGroupId({payload}, {call, put}) {
       const response = yield call(fetchOnlineDataByGroupId, payload);
       yield put({
@@ -120,7 +125,7 @@ const ItemModel: ItemModelType = {
         itemTypeList: action.payload
       }
     },
-    resetOpcUaItemList(state = state, action) {
+    resetOpcUaItemList(state = state) {
       return {
         ...state,
         opcUaItemList: []

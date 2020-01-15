@@ -42,21 +42,72 @@ const MenuModel: MenuModelType = {
       {
         path: '/project',
         name: 'Project',
-        icon: 'setting',
+        icon: 'project',
         children: [
           {
             path: '/project/server',
             name: 'Activated Opc UA Server',
-            icon: 'database',
+            icon: 'setting',
             component: './project/server',
             exact: true
           },
           {
             path: '/project/connection',
             name: 'Activated Connections',
-            icon: 'thunderbolt',
+            icon: 'cluster',
             exact: true
           },
+          {
+            path: '/project/alarmConfig',
+            name: 'Alarm Configuration',
+            icon: 'file-text',
+            children: [
+              {
+                path: '/project/alarmConfig/alarmBase',
+                name: "Alarm Base Info.",
+                icon: 'block',
+                component: './project/alarmConfig/alarmBase'
+              }
+            ]
+          },
+        ]
+      },
+      {
+        path: '/history',
+        name: 'History',
+        icon: 'database',
+        children: [
+          {
+            path: '/history/itemHistory',
+            name: "Opc Ua Item History",
+            icon: 'block',
+            component: './history/itemHistory',
+          },
+          {
+            path: '/history/alarmHistory',
+            name: "Opc Ua Alarm History",
+            icon: 'block',
+            component: './history/alarmHistory',
+          }
+        ]
+      },
+      {
+        path: '/sms',
+        name: 'SMS Alarm',
+        icon: 'customer-service',
+        children: [
+          {
+            path: '/sms/role',
+            name: "SMS Role",
+            icon: 'team',
+            component: './sms/role',
+          },
+          {
+            path: '/sms/user',
+            name: "SMS User",
+            icon: 'user',
+            component: './sms/user',
+          }
         ]
       },
       {

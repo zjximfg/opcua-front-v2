@@ -3,7 +3,7 @@ import {Dispatch} from "redux";
 import {ItemModelStateType} from "@/models/item";
 import OpcUaGroupDataType from "@/pages/project/components/Group/opcUaGroup";
 import OpcUaConnectionDataType from "@/pages/project/connection/opcUaConnection";
-import {Button, Card, Col, Divider, Form, Input, InputNumber, Modal, Radio, Row, Select, Table} from "antd";
+import {Button, Card, Col, Divider, Form, Input, InputNumber, Modal, Radio, Row, Select, Table, Tag} from "antd";
 import {connect} from "dva";
 import LoadingDataType from "@/models/loading";
 import {FormComponentProps} from "antd/es/form";
@@ -13,6 +13,7 @@ import ItemCategoryDataType from "@/pages/project/components/Item/opcUaItem";
 import OpcUaItemDataType from "@/pages/project/components/Item/opcUaItem";
 import ItemObjectDataType from "@/pages/project/components/Item/opcUaItem";
 import ItemTypeDataType from "@/pages/project/components/Item/opcUaItem";
+import ItemCurve from "@/pages/project/components/Item/ItemCurve";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -30,15 +31,16 @@ interface ItemState {
   visible: boolean;
   formType: 'edit' | 'create' | undefined;
   current?: Partial<OpcUaItemDataType>;
-  selectedRowKeys: string[] | number[];
   intervalNumber: NodeJS.Timeout | null;
   state: 'online' | 'offline';
   itemObjectOptionList: Array<ItemObjectDataType>;
   itemTypeOptionList: Array<ItemTypeDataType>;
-  dbNumberShow: boolean,
-  bitAddressShow: boolean,
-  stringLengthShow: boolean,
-  quantityShow: boolean,
+  dbNumberShow: boolean;
+  bitAddressShow: boolean;
+  stringLengthShow: boolean;
+  quantityShow: boolean;
+  curveVisible: boolean;
+  curveCurrent?: Partial<OpcUaItemDataType>;
 }
 
 @connect(({item, loading}: { item: ItemModelStateType, loading: LoadingDataType }) => {
@@ -53,7 +55,6 @@ class Item extends React.Component<ItemProps, ItemState> {
     visible: false,
     formType: undefined,
     current: undefined,
-    selectedRowKeys: [],
     intervalNumber: null,
     state: 'offline',
     itemObjectOptionList: [],
@@ -62,11 +63,13 @@ class Item extends React.Component<ItemProps, ItemState> {
     bitAddressShow: false,
     stringLengthShow: false,
     quantityShow: false,
+    curveVisible: false,
+    curveCurrent: undefined,
   };
 
 
   componentWillReceiveProps(nextProps: Readonly<ItemProps>, nextContext: any): void {
-    if (this.props.opcUaGroup.id !== nextProps.opcUaGroup.id ) {
+    if (this.props.opcUaGroup.id !== nextProps.opcUaGroup.id) {
       if (!("id" in nextProps.opcUaGroup)) return;
       if (!this.props.dispatch) return;
       this.props.dispatch({
@@ -136,6 +139,13 @@ class Item extends React.Component<ItemProps, ItemState> {
     this.setTypeInitValue(this.props.itemModel.itemTypeList, 1);
   };
 
+  showCurveModal = (item: OpcUaItemDataType) => {
+    this.setState({
+      curveVisible: true,
+      curveCurrent: item,
+    })
+  };
+
   showEditModal = (item: OpcUaItemDataType): void => {
     if (!this.props.itemModel) return;
 
@@ -148,7 +158,7 @@ class Item extends React.Component<ItemProps, ItemState> {
       dbNumberShow: itemObject ? itemObject.name === 'db' : false,
       bitAddressShow: itemType ? itemType.s7Name === 'x' : false,
       stringLengthShow: itemType ? itemType.s7Name === 's' : false,
-      quantityShow: item.isArray? (itemType ? itemType.s7Name === 'tda' : true) : false
+      quantityShow: item.isArray ? (itemType ? itemType.s7Name === 'tda' : true) : false
     });
     this.setObjectInitValue(this.props.itemModel.itemObjectList, item.itemCategoryId);
     this.setTypeInitValue(this.props.itemModel.itemTypeList, item.itemCategoryId);
@@ -276,7 +286,7 @@ class Item extends React.Component<ItemProps, ItemState> {
     if (!this.props.itemModel) return;
     const itemType = this.props.itemModel.itemTypeList.find((item: ItemTypeDataType) => item.id === this.props.form.getFieldValue("itemTypeId"));
     this.setState({
-      quantityShow: item? (itemType ? itemType.s7Name === 'tda' : true) : false
+      quantityShow: item ? (itemType ? itemType.s7Name === 'tda' : true) : false
     })
   };
 
@@ -284,7 +294,7 @@ class Item extends React.Component<ItemProps, ItemState> {
 
     const {itemModel, opcUaConnection, opcUaGroup, form} = this.props;
 
-    const {visible, current = {}, state, itemObjectOptionList, itemTypeOptionList, } = this.state;
+    const {visible, current = {}, state, itemObjectOptionList, itemTypeOptionList, curveCurrent = {}, curveVisible} = this.state;
 
     const {getFieldDecorator} = form;
 
@@ -340,6 +350,28 @@ class Item extends React.Component<ItemProps, ItemState> {
         dataIndex: 'currentValue',
       },
       {
+        key: 'quality',
+        title: 'Quality',
+        dataIndex: 'quality',
+        render: quality => {
+          let color = 'geekblue';
+          if (!quality || this.state.state === 'offline') return (<span>
+            <Tag color={color} key={"offline"}>
+                {"offline".toUpperCase()}
+            </Tag>
+          </span>);
+          if (quality === 'good') color = 'green';
+          if (quality === 'bad') color = 'volcano';
+          return (
+            <span>
+              <Tag color={color} key={quality}>
+                {quality.toUpperCase()}
+              </Tag>
+            </span>
+          )
+        }
+      },
+      {
         key: 'action',
         title: 'Action',
         render: (text, record) => renderTableAction(record)
@@ -349,6 +381,11 @@ class Item extends React.Component<ItemProps, ItemState> {
     const renderTableAction = (item: OpcUaItemDataType): React.ReactNode => {
       return (
         <div>
+          <a key={"curve"} onClick={e => {
+            e.preventDefault();
+            this.showCurveModal(item);
+          }}>View</a>
+          <Divider type={"vertical"}/>
           <a key={"edit"} onClick={e => {
             e.preventDefault();
             this.showEditModal(item);
@@ -361,7 +398,6 @@ class Item extends React.Component<ItemProps, ItemState> {
         </div>
       )
     };
-
 
     const renderForm = (): React.ReactNode => {
       if (!this.props.itemModel) return;
@@ -499,7 +535,7 @@ class Item extends React.Component<ItemProps, ItemState> {
                 initialValue: current.description,
                 rules: [{required: true, message: "Please input the Description"}]
               })(
-                <Input type={"text"} placeholder={'Description'} />
+                <Input type={"text"} placeholder={'Description'}/>
               )
             }
           </FormItem>
@@ -553,6 +589,27 @@ class Item extends React.Component<ItemProps, ItemState> {
           }}
         >
           {renderForm()}
+        </Modal>
+        <Modal
+          title={"Item <" + curveCurrent.fullName + "> Curve"}
+          width={900}
+          bodyStyle={{padding: '28px 0 0'}}
+          destroyOnClose
+          visible={this.state.curveVisible}
+          onOk={() => {
+            this.setState({
+              curveVisible: false,
+              curveCurrent: undefined
+            })
+          }}
+          onCancel={() => {
+            this.setState({
+              curveVisible: false,
+              curveCurrent: undefined
+            })
+          }}
+        >
+          <ItemCurve item={curveCurrent} visible={curveVisible}/>
         </Modal>
       </>
     );
