@@ -53,10 +53,18 @@ class AlarmList extends React.Component<AlarmListProps, AlarmListState> {
     if (!this.props.roleModel.selectedRole || !nextProps.roleModel.selectedRole) return;
     // 原先未选择，现在选择了 || 原先的id 和新的id不同
     if (!("id" in this.props.roleModel.selectedRole) && "id" in nextProps.roleModel.selectedRole || this.props.roleModel.selectedRole.id !== nextProps.roleModel.selectedRole.id) {
-      nextProps.dispatch({
-        type: 'alarmList/fetchAlarmList',
-        payload: {roleId: nextProps.roleModel.selectedRole.id},
-      })
+      if (!("id" in nextProps.roleModel.selectedRole)) {
+        nextProps.dispatch({
+          type: 'alarmList/queryAlarmList',
+          payload: []
+        })
+      } else {
+        nextProps.dispatch({
+          type: 'alarmList/fetchAlarmList',
+          payload: {roleId: nextProps.roleModel.selectedRole.id},
+        })
+      }
+
     }
   }
 
