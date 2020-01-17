@@ -165,8 +165,8 @@ export default {
                   component: './sms/role',
                 },
                 {
-                  path: '/sms/user',
-                  component: './sms/user',
+                  path: '/sms/smsUser',
+                  component: './sms/smsUser',
                 }
               ]
             },

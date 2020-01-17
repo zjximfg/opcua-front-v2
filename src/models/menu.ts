@@ -103,10 +103,10 @@ const MenuModel: MenuModelType = {
             component: './sms/role',
           },
           {
-            path: '/sms/user',
+            path: '/sms/smsUser',
             name: "SMS User",
             icon: 'user',
-            component: './sms/user',
+            component: './sms/smsUser',
           }
         ]
       },
